@@ -3,18 +3,24 @@ package mod.fealtous.minorconvenience.eventhandlers;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import mod.fealtous.minorconvenience.MinorConvenience;
+import mod.fealtous.minorconvenience.nondungeonsolvers.SolverUtils;
 import mod.fealtous.minorconvenience.utils.ScoreboardUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.screen.inventory.ChestScreen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.monster.BlazeEntity;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.text.*;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -138,8 +144,50 @@ public class DungeonEvents {
             if (!tags.contains("baseStatBoostPercentage")) return;
             int statBoost = tags.getInt("baseStatBoostPercentage");
             int floor = tags.getInt("item_tier");
-            tt.add(0,new StringTextComponent("Floor: ").mergeStyle(TextFormatting.GOLD).appendString(floor > 7 ? "m" + (floor - 6) : floor + " | " + statBoost + "%"));
+            tt.add(0,new StringTextComponent("Floor: ").mergeStyle(TextFormatting.GOLD).appendString((floor > 7 ? "M" + (floor - 6) : floor) + " | " + statBoost + "%"));
         }
+    }
+    static String itemType;
+    /*
+    Terminal Solvers
+     */
+    @SubscribeEvent
+    public static void necronTerminalSolve(TickEvent.ClientTickEvent e) {
+        if (e.phase != TickEvent.Phase.START) return;
+        Minecraft mc = Minecraft.getInstance();
+        ClientPlayerEntity player = mc.player;
+        if (mc.currentScreen instanceof ChestScreen) {
+            if ( player == null) return;
+            String inventoryName = mc.currentScreen.getTitle().getString().trim();
+            if (inventoryName.startsWith("Select all the ")) {
+                itemType = inventoryName.split(" ")[3];
+            }
+            if (inventoryName.startsWith("What starts with")) {
+                itemType = inventoryName.split(" ")[3].substring(0,1);
+                System.out.println(itemType);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void necronTerminalRender(GuiScreenEvent.DrawScreenEvent.Post e) {
+        if (e.getGui() instanceof ChestScreen) {
+            if (!inDungeons || itemType == null) return;
+            for (Slot s : ((ChestScreen) e.getGui()).getContainer().inventorySlots) {
+                //Color terminal
+                if (StringUtils.stripControlCodes(s.getStack().getDisplayName().getString()).contains(itemType) && !e.getGui().getTitle().getString().startsWith("What starts with")) {
+                    SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos, s.yPos, 0x77000000);
+                }
+                //Starts with letter terminal
+                if (s.getStack().getDisplayName().getString().startsWith(itemType) && e.getGui().getTitle().getString().startsWith("What starts with")) {
+                    SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos , s.yPos, 0x77000000);
+                }
+            }
+        }
+    }
+    @SubscribeEvent
+    public static void terminalOpen(GuiOpenEvent e) {
+        itemType = null;
     }
 
 }
