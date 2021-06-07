@@ -161,10 +161,10 @@ public class DungeonEvents {
             String inventoryName = mc.currentScreen.getTitle().getString().trim();
             if (inventoryName.startsWith("Select all the ")) {
                 itemType = inventoryName.split(" ")[3];
+
             }
             if (inventoryName.startsWith("What starts with")) {
                 itemType = inventoryName.split(" ")[3].substring(0,1);
-                System.out.println(itemType);
             }
         }
     }
@@ -175,12 +175,13 @@ public class DungeonEvents {
             if (!inDungeons || itemType == null) return;
             for (Slot s : ((ChestScreen) e.getGui()).getContainer().inventorySlots) {
                 //Color terminal
-                if (StringUtils.stripControlCodes(s.getStack().getDisplayName().getString()).contains(itemType) && !e.getGui().getTitle().getString().startsWith("What starts with")) {
-                    SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos, s.yPos, 0x77000000);
+                if (colors(s) && !e.getGui().getTitle().getString().startsWith("What starts with")) {
+                    SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos, s.yPos, 0x99000000);
+                    System.out.println(s.getStack().getDisplayName());
                 }
                 //Starts with letter terminal
                 if (s.getStack().getDisplayName().getString().startsWith(itemType) && e.getGui().getTitle().getString().startsWith("What starts with")) {
-                    SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos , s.yPos, 0x77000000);
+                    SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos , s.yPos, 0x99000000);
                 }
             }
         }
@@ -189,6 +190,14 @@ public class DungeonEvents {
     public static void terminalOpen(GuiOpenEvent e) {
         itemType = null;
     }
+    private static boolean colors(Slot s) {
+        String sName = StringUtils.stripControlCodes(s.getStack().getDisplayName().getString().toUpperCase());
+        //Brute force any oddities
+        if (sName.contains(itemType)) return true;
+        if (itemType.equals("BLACK") && sName.contains("SAC")) return true;
+        if (itemType.equals("WHITE") && sName.contains("MEAL")) return true;
 
+        return false;
+    }
 }
 

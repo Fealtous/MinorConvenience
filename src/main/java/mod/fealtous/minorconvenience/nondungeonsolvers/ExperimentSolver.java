@@ -74,7 +74,7 @@ public class ExperimentSolver {
                     }
                     if (clickInOrderSlots[lastClicked] != null) {
                         Slot nextSlot = clickInOrderSlots[lastClicked];
-                        SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), nextSlot.xPos, nextSlot.yPos, NEXT + 0x77000000);
+                        SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), nextSlot.xPos, nextSlot.yPos, NEXT + 0x99000000);
                     }
                 }
             }
