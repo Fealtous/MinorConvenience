@@ -10,10 +10,10 @@ displayName="Minor Convenience" #mandatory
 displayURL="https://my.url.me" #optional
 
 logoFile="minorconvenience.png" #optional
-credits="Thanks to Forge for its amazing API, those on its discord, and specifically gigaherz for having great mods to check code with." #optional
+credits="Thanks to Forge for its amazing API, those on its discord, and specifically gigaherz, Cadiboo, and the Minecolonies team for having great mods to check code with." #optional
 authors="Fealtous" #optional
 description='''
-This mod is simply a collection of minor conveniences, specifically geared towards Hypixel Skyblock.
+This mod is simply a collection of minor conveniences intended to be used on Hypixel Skyblock.
 '''
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
