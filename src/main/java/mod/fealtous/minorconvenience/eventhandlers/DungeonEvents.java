@@ -187,6 +187,7 @@ public class DungeonEvents {
         }
     }
     @SubscribeEvent
+
     public static void terminalOpen(GuiOpenEvent e) {
         itemType = null;
     }
@@ -195,7 +196,10 @@ public class DungeonEvents {
         //Brute force any oddities
         if (sName.contains(itemType)) return true;
         if (itemType.equals("BLACK") && sName.contains("SAC")) return true;
-        if (itemType.equals("WHITE") && sName.contains("MEAL")) return true;
+        if (itemType.equals("SILVER") && sName.contains("LIGHT GRAY")) return true;
+        if (itemType.equals("WHITE") && (sName.contains("MEAL") || sName.contains("WOOL"))) return true;
+        if (itemType.equals("BLUE") && sName.contains("LAPIS") && !sName.contains("LIGHT")) return true;
+        if (itemType.equals("BROWN") && sName.contains("BEAN")) return true;
 
         return false;
     }
