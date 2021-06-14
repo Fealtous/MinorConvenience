@@ -63,6 +63,7 @@ public class DungeonEvents {
     public static void bowDraw(ArrowNockEvent e) {
         if (e.getPlayer() == Minecraft.getInstance().player && bOrdered.isEmpty() && inDungeons) {
             bOrdered = checkForBlaze();
+
         }
     }
     @SubscribeEvent
