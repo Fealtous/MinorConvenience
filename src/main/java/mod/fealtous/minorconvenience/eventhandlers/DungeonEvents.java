@@ -1,12 +1,14 @@
 package mod.fealtous.minorconvenience.eventhandlers;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import mod.fealtous.minorconvenience.MinorConvenience;
 import mod.fealtous.minorconvenience.nondungeonsolvers.SolverUtils;
 import mod.fealtous.minorconvenience.utils.ScoreboardUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.MapItemRenderer;
 import net.minecraft.client.gui.screen.inventory.ChestScreen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -14,20 +16,21 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.monster.BlazeEntity;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.MapItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.text.*;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.world.storage.MapData;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.opengl.GL11;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -81,7 +84,7 @@ public class DungeonEvents {
     }
 
     @SubscribeEvent
-    public static void renderIndicator(RenderWorldLastEvent e) {
+    public static void renderBlazeIndicator(RenderWorldLastEvent e) {
         MatrixStack matrixStack = e.getMatrixStack();
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         if (buffer == null) return;
@@ -93,7 +96,7 @@ public class DungeonEvents {
         if (!bOrdered.isEmpty()) {
             if (bOrdered.size() != 1) {
                 WorldRenderer.drawBoundingBox(matrixStack, iVertexBuilder, bOrdered.getFirst().getBoundingBox(), 1, 0, 0, 1);
-                WorldRenderer.drawBoundingBox(matrixStack, iVertexBuilder, bOrdered.getLast().getBoundingBox(), 0, 0, 1, 1);
+                WorldRenderer.drawBoundingBox(matrixStack, iVertexBuilder, bOrdered.getLast().getBoundingBox(), 0, 1, 0, 1);
             }
             else {
                 WorldRenderer.drawBoundingBox(matrixStack, iVertexBuilder, bOrdered.get(0).getBoundingBox(), 1, 1, 1, 1);
@@ -203,6 +206,32 @@ public class DungeonEvents {
         if (itemType.equals("BROWN") && sName.contains("BEAN")) return true;
 
         return false;
+    }
+    /*
+    Minimap renderer
+     */
+    @SubscribeEvent
+    public static void renderMinimap(RenderGameOverlayEvent.Post e) {
+        Minecraft mc = Minecraft.getInstance();
+        if (e.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
+        if (mc.player == null || mc.world == null) return;
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        if (buffer == null) return;
+        ItemStack i = mc.player.inventory.mainInventory.get(8);
+        if (i.getItem() instanceof FilledMapItem) {
+            MapItemRenderer mir = mc.gameRenderer.getMapItemRenderer();
+            MapData data = FilledMapItem.getMapData(i, mc.world);
+            if (data != null) {
+
+                MatrixStack ms = e.getMatrixStack();
+                ms.push();
+                ms.translate(5,5,0);
+                ms.scale(.8f,.8f,0);
+                mir.renderMap(ms, buffer, data, false, 15728880);
+                ms.pop();
+            }
+
+        }
     }
 }
 

@@ -4,14 +4,12 @@ import mod.fealtous.minorconvenience.MinorConvenience;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.BlazeEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import org.apache.logging.log4j.Level;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class DungeonUtils {
     public static LinkedList<BlazeEntity> checkForBlaze() {
