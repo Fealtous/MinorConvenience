@@ -1,5 +1,6 @@
 package mod.fealtous.minorconvenience.eventhandlers;
 
+import com.mojang.authlib.yggdrasil.request.JoinMinecraftServerRequest;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -51,11 +52,9 @@ public class DungeonEvents {
         if (counter % 200 == 0) {
             List<ITextComponent> scoreboard = ScoreboardUtil.getSidebars();
             for (ITextComponent s : scoreboard) {
-                if (ScoreboardUtil.cleanInput(s).contains("Catacombs")) {
-                    flag = true;
-                }
+                inDungeons = (ScoreboardUtil.cleanInput(s).contains("Catacombs"));
+                if (inDungeons) break;
             }
-            inDungeons = flag;
         }
         if (!inDungeons && !bOrdered.isEmpty()) {
             bOrdered = new LinkedList<>();
@@ -177,14 +176,15 @@ public class DungeonEvents {
     public static void necronTerminalRender(GuiScreenEvent.DrawScreenEvent.Post e) {
         if (e.getGui() instanceof ChestScreen) {
             if (!inDungeons || itemType == null) return;
+            boolean startsWith = e.getGui().getTitle().getString().contains("What starts with");
             for (Slot s : ((ChestScreen) e.getGui()).getContainer().inventorySlots) {
                 //Color terminal
-                if (colors(s) && !e.getGui().getTitle().getString().startsWith("What starts with")) {
+                if (colors(s) && !startsWith) {
                     SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos, s.yPos, 0x99000000);
                     System.out.println(s.getStack().getDisplayName());
                 }
                 //Starts with letter terminal
-                if (s.getStack().getDisplayName().getString().startsWith(itemType) && e.getGui().getTitle().getString().startsWith("What starts with")) {
+                if (s.getStack().getDisplayName().getString().startsWith(itemType) && startsWith) {
                     SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos , s.yPos, 0x99000000);
                 }
             }
@@ -211,7 +211,7 @@ public class DungeonEvents {
     Minimap renderer
      */
     @SubscribeEvent
-    public static void renderMinimap(RenderGameOverlayEvent.Post e) {
+    public static void renderMinimap(RenderGameOverlayEvent e) {
         Minecraft mc = Minecraft.getInstance();
         if (e.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
         if (mc.player == null || mc.world == null) return;
@@ -222,16 +222,16 @@ public class DungeonEvents {
             MapItemRenderer mir = mc.gameRenderer.getMapItemRenderer();
             MapData data = FilledMapItem.getMapData(i, mc.world);
             if (data != null) {
-
                 MatrixStack ms = e.getMatrixStack();
                 ms.push();
                 ms.translate(5,5,0);
-                ms.scale(.8f,.8f,0);
+                ms.scale(1.1f,1.1f,0);
                 mir.renderMap(ms, buffer, data, false, 15728880);
                 ms.pop();
             }
 
         }
     }
+
 }
 

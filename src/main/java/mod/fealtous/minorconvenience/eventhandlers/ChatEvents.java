@@ -1,5 +1,6 @@
 package mod.fealtous.minorconvenience.eventhandlers;
 
+import mod.fealtous.minorconvenience.utils.ScoreboardUtil;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.text.ChatType;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -18,7 +19,7 @@ public class ChatEvents {
     @SubscribeEvent
     public static void chatMessageFilter(ClientChatReceivedEvent e) {
         if (e.getType() != ChatType.CHAT) return;
-        String msg = StringUtils.stripControlCodes(e.getMessage().getString());
+        String msg = ScoreboardUtil.cleanInput(e.getMessage());
         if (msg.equals(savedMessage)) {
             e.setCanceled(true);
         }
