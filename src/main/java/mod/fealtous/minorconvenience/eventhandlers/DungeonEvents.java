@@ -1,14 +1,15 @@
 package mod.fealtous.minorconvenience.eventhandlers;
 
-import com.mojang.authlib.yggdrasil.request.JoinMinecraftServerRequest;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import mod.fealtous.minorconvenience.MinorConvenience;
 import mod.fealtous.minorconvenience.nondungeonsolvers.SolverUtils;
 import mod.fealtous.minorconvenience.utils.ScoreboardUtil;
+import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.MapItemRenderer;
 import net.minecraft.client.gui.screen.inventory.ChestScreen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -19,11 +20,15 @@ import net.minecraft.entity.monster.BlazeEntity;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.MapItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.StringUtils;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.*;
 import net.minecraft.world.storage.MapData;
+import net.minecraft.world.storage.MapDecoration;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -31,7 +36,6 @@ import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.lwjgl.opengl.GL11;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -65,7 +69,6 @@ public class DungeonEvents {
     public static void bowDraw(ArrowNockEvent e) {
         if (e.getPlayer() == Minecraft.getInstance().player && bOrdered.isEmpty() && inDungeons) {
             bOrdered = checkForBlaze();
-
         }
     }
     @SubscribeEvent
@@ -212,21 +215,25 @@ public class DungeonEvents {
      */
     @SubscribeEvent
     public static void renderMinimap(RenderGameOverlayEvent e) {
+
         Minecraft mc = Minecraft.getInstance();
         if (e.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
         if (mc.player == null || mc.world == null) return;
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-        if (buffer == null) return;
-        ItemStack i = mc.player.inventory.mainInventory.get(8);
+        ItemStack i = mc.player.inventory.mainInventory.get(8); //todo
+        float mapScale = 2f; //todo add ingame minimap scaling
+
         if (i.getItem() instanceof FilledMapItem) {
-            MapItemRenderer mir = mc.gameRenderer.getMapItemRenderer();
-            MapData data = FilledMapItem.getMapData(i, mc.world);
+
+            MapData data = FilledMapItem.getData(i, mc.world);
+
             if (data != null) {
+
                 MatrixStack ms = e.getMatrixStack();
                 ms.push();
-                ms.translate(5,5,0);
-                ms.scale(1.1f,1.1f,0);
-                mir.renderMap(ms, buffer, data, false, 15728880);
+                ms.translate(mc.gameSettings.guiScale *2,mc.gameSettings.guiScale *2,0);
+                ms.scale(mapScale/mc.gameSettings.guiScale, mapScale/ mc.gameSettings.guiScale,0);
+                mc.gameRenderer.getMapItemRenderer().renderMap(ms, buffer, data, false, mc.getRenderManager().getPackedLight(mc.player, e.getPartialTicks()));
                 ms.pop();
             }
 

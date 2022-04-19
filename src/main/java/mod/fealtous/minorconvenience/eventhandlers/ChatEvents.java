@@ -24,8 +24,7 @@ public class ChatEvents {
             e.setCanceled(true);
         }
         else {
-
-            if (msg.matches(".*[fF][rR][eE]{2}\\s\\d+.*[mM][iI][lL]{2}[iI][oO][nN].*") || msg.startsWith("This ability is on cooldown") ||
+            if (msg.matches("Don Expresso") || msg.startsWith("This ability is on cooldown") ||
             msg.startsWith("There blocks in the way")) {
                 e.setCanceled(true);
                 return;
