@@ -4,12 +4,8 @@ import mod.fealtous.minorconvenience.eventhandlers.ChatEvents;
 import mod.fealtous.minorconvenience.eventhandlers.DungeonEvents;
 import mod.fealtous.minorconvenience.eventhandlers.Hotkeys;
 import mod.fealtous.minorconvenience.nondungeonsolvers.ExperimentSolver;
-import net.minecraft.block.StemBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.item.HoeItem;
-import net.minecraft.item.ShovelItem;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.level.block.Block;
@@ -53,15 +49,15 @@ public class MinorConvenience
     public void superGigaStemProtector(InputEvent.ClickInputEvent e) {
         ClientLevel world = Minecraft.getInstance().level;
         if (!e.isAttack() || world == null) return;
-        Object o = Minecraft.getInstance().objectMouseOver;
+        Object o = Minecraft.getInstance().hitResult;
         BlockHitResult blockLook = null;
-        if (o instanceof BlockRayTraceResult) {
-            blockLook = (BlockRayTraceResult ) o;
+        if (o instanceof BlockHitResult) {
+            blockLook = (BlockHitResult ) o;
         }
         if (blockLook == null) return; //Safety nulls... should never occur.
-        Block block = world.getBlockState(blockLook).getBlock();
-        Block blockBelow = world.getBlockState(blockLook.getPos().up(1)).getBlock();
-        Block blockAbove = world.getBlockState(blockLook.getPos().down(1)).getBlock();
+        Block block = world.getBlockState(blockLook.getBlockPos()).getBlock();
+        Block blockBelow = world.getBlockState(blockLook.getBlockPos().above(1)).getBlock();
+        Block blockAbove = world.getBlockState(blockLook.getBlockPos().below(1)).getBlock();
 
         if (Minecraft.getInstance().player == null) return;
         //If attempting to mine either the farmland below the stem or the stem itself.
