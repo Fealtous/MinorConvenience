@@ -1,9 +1,6 @@
 package mod.fealtous.minorconvenience.eventhandlers;
 
-import com.mojang.authlib.yggdrasil.request.JoinMinecraftServerRequest;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import mod.fealtous.minorconvenience.MinorConvenience;
 import mod.fealtous.minorconvenience.nondungeonsolvers.SolverUtils;
 import mod.fealtous.minorconvenience.utils.ScoreboardUtil;
@@ -12,26 +9,29 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.MapItemRenderer;
 import net.minecraft.client.gui.screen.inventory.ChestScreen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.entity.monster.BlazeEntity;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.MapItem;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.StringUtils;
 import net.minecraft.util.text.*;
+import net.minecraft.world.entity.monster.Blaze;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.storage.MapData;
-import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.lwjgl.opengl.GL11;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +42,7 @@ import static mod.fealtous.minorconvenience.utils.DungeonUtils.checkForBlaze;
 public class DungeonEvents {
 
     private static int counter = 0;
-    private static LinkedList<BlazeEntity> bOrdered = new LinkedList<>();
+    private static LinkedList<Blaze> bOrdered = new LinkedList<>();
     private static boolean inDungeons = false;
 
     @SubscribeEvent
@@ -50,7 +50,7 @@ public class DungeonEvents {
         counter++;
         boolean flag = false; //Yes, I know it's ugly...
         if (counter % 200 == 0) {
-            List<ITextComponent> scoreboard = ScoreboardUtil.getSidebars();
+            List<TextComponent> scoreboard = ScoreboardUtil.getSidebars();
             for (ITextComponent s : scoreboard) {
                 inDungeons = (ScoreboardUtil.cleanInput(s).contains("Catacombs"));
                 if (inDungeons) break;
@@ -71,25 +71,26 @@ public class DungeonEvents {
     @SubscribeEvent
     public static void onKillBlaze(LivingDeathEvent e) {
 
-        if (e.getEntity() instanceof BlazeEntity) {
+        if (e.getEntity() instanceof Blaze) {
             if (bOrdered.isEmpty()) return;
-            if (bOrdered.getFirst().getUniqueID() == (e.getEntity().getUniqueID())) {
+            if (bOrdered.getFirst().getUUID() == (e.getEntity().getUUID())) {
                 bOrdered.removeFirst();
             }
-            else if(bOrdered.getLast().getUniqueID() == (e.getEntity().getUniqueID())) {
+            else if(bOrdered.getLast().getUUID() == (e.getEntity().getUUID())) {
                 bOrdered.removeLast();
             }
         }
     }
 
     @SubscribeEvent
-    public static void renderBlazeIndicator(RenderWorldLastEvent e) {
-        MatrixStack matrixStack = e.getMatrixStack();
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+    public static void renderBlazeIndicator(RenderLevelLastEvent e) {
+        LevelRenderer levelRenderer = e.getLevelRenderer();
+
+        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         if (buffer == null) return;
-        IVertexBuilder iVertexBuilder = buffer.getBuffer(RenderType.getLines());
-        matrixStack.push();
-        ClientPlayerEntity player = Minecraft.getInstance().player;
+        IVertex iVertexBuilder = buffer.getBuffer(RenderType.lines());
+
+        Player player = Minecraft.getInstance().player;
         if (player == null) return;
         matrixStack.translate(-player.getPosX(),-player.getPosYEye(),-player.getPosZ());
         if (!bOrdered.isEmpty()) {
@@ -102,7 +103,7 @@ public class DungeonEvents {
             }
         }
         matrixStack.pop();
-        buffer.finish(RenderType.LINES);
+        buffer.endBatch(RenderType.LINES);
 
     }
     /*

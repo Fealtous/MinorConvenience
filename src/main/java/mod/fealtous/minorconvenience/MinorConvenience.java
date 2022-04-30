@@ -4,13 +4,17 @@ import mod.fealtous.minorconvenience.eventhandlers.ChatEvents;
 import mod.fealtous.minorconvenience.eventhandlers.DungeonEvents;
 import mod.fealtous.minorconvenience.eventhandlers.Hotkeys;
 import mod.fealtous.minorconvenience.nondungeonsolvers.ExperimentSolver;
-import net.minecraft.block.Block;
 import net.minecraft.block.StemBlock;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.ShovelItem;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.StemBlock;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -47,15 +51,15 @@ public class MinorConvenience
 
     @SubscribeEvent
     public void superGigaStemProtector(InputEvent.ClickInputEvent e) {
-        ClientWorld world = Minecraft.getInstance().world;
+        ClientLevel world = Minecraft.getInstance().level;
         if (!e.isAttack() || world == null) return;
         Object o = Minecraft.getInstance().objectMouseOver;
-        BlockRayTraceResult blockLook = null;
+        BlockHitResult blockLook = null;
         if (o instanceof BlockRayTraceResult) {
             blockLook = (BlockRayTraceResult ) o;
         }
         if (blockLook == null) return; //Safety nulls... should never occur.
-        Block block = world.getBlockState(blockLook.getPos()).getBlock();
+        Block block = world.getBlockState(blockLook).getBlock();
         Block blockBelow = world.getBlockState(blockLook.getPos().up(1)).getBlock();
         Block blockAbove = world.getBlockState(blockLook.getPos().down(1)).getBlock();
 
@@ -63,8 +67,8 @@ public class MinorConvenience
         //If attempting to mine either the farmland below the stem or the stem itself.
         //Mining allowed if using shovel or hoe.
         if ((block instanceof StemBlock || blockBelow instanceof StemBlock || blockAbove instanceof StemBlock) &&
-                !(Minecraft.getInstance().player.getHeldItemMainhand().getItem() instanceof HoeItem) &&
-                !(Minecraft.getInstance().player.getHeldItemMainhand().getItem() instanceof ShovelItem)) {
+                !(Minecraft.getInstance().player.getMainHandItem().getItem() instanceof HoeItem) &&
+                !(Minecraft.getInstance().player.getMainHandItem().getItem() instanceof ShovelItem)) {
             e.setSwingHand(false);
             e.setCanceled(true);
         }
