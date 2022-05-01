@@ -1,10 +1,25 @@
 package mod.fealtous.minorconvenience.utils;
 
-/*
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Score;
+import net.minecraft.world.scores.Scoreboard;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ScoreboardUtil {
 
     //Had to custom write this, don't know what's wrong
-    public static String cleanInput(TextComponent scoreboard) {
+    public static String cleanInput(Component scoreboard) {
         char[] nvString = scoreboard.getString().toCharArray();
         StringBuilder stringBuilder = new StringBuilder();
         boolean flag = false;
@@ -25,9 +40,9 @@ public class ScoreboardUtil {
     }
     /*
     Based off of Dankers, might clean up later if needed
-     *//*
-    public static List<TextComponent> getSidebars() {
-        List<TextComponent> bars = new ArrayList<>();
+     */
+    public static List<Component> getSidebars() {
+        List<Component> bars = new ArrayList<>();
         if (Minecraft.getInstance().level == null) return bars;
         Scoreboard scoreboard = Minecraft.getInstance().level.getScoreboard();
         if (scoreboard == null) return bars;
@@ -37,6 +52,7 @@ public class ScoreboardUtil {
         Objective[] scores = scoreboard.displayObjectives;
         //if score is not null and playername is not null and is not an info thing
         //then add it to the list
+
         List<Score> list = Arrays.stream(scores).filter(i -> i != null &&
                 i.getName() != null &&
                 !i.getFormattedDisplayName().getString().startsWith("#")
@@ -50,8 +66,8 @@ public class ScoreboardUtil {
         }
         for (Score s : scores) {
             PlayerTeam team = scoreboard.getPlayersTeam(s.getOwner());
-            TextComponent pname = new TextComponent(s.getOwner());
-            bars.add((TextComponent) PlayerTeam.formatNameForTeam(team, pname));
+            Component pname = new Component(s.getOwner());
+            bars.add((Component) PlayerTeam.formatNameForTeam(team, pname));
         }
         return bars;
 
@@ -59,4 +75,3 @@ public class ScoreboardUtil {
 
     }
 }
-*/

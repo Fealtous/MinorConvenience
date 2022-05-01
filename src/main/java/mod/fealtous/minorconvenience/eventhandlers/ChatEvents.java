@@ -1,8 +1,7 @@
 package mod.fealtous.minorconvenience.eventhandlers;
 
 import mod.fealtous.minorconvenience.utils.ScoreboardUtil;
-import net.minecraft.util.StringUtils;
-import net.minecraft.util.text.ChatType;
+import net.minecraft.network.chat.ChatType;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 

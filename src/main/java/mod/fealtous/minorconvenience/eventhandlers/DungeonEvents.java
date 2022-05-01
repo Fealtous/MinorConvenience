@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.inventory.ChestScreen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -33,9 +34,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.storage.MapData;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
@@ -176,7 +175,7 @@ public class DungeonEvents {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
 
-        if (mc.screen instanceof ChestMenu) {
+        if (mc.screen instanceof AbstractContainerScreen) {
             if ( player == null) return;
             String inventoryName = mc.screen.getTitle().getString().trim();
             if (inventoryName.startsWith("Select all the ")) {
@@ -190,12 +189,12 @@ public class DungeonEvents {
     }
 
     @SubscribeEvent
-    public static void necronTerminalRender(GuiScreenEvent.DrawScreenEvent.Post e) {
+    public static void necronTerminalRender(ScreenEvent.DrawScreenEvent.Post e) {
 
-        if (e.getGui() instanceof ChestScreen) {
+        if (e.getScreen() instanceof AbstractContainerScreen) {
             if (!inDungeons || itemType == null) return;
-            boolean startsWith = e.getGui().getTitle().getString().contains("What starts with");
-            for (Slot s : ((ChestScreen) e.getGui()).getContainer().inventorySlots) {
+            boolean startsWith = e.getScreen().getTitle().getString().contains("What starts with");
+            for (Slot s : ((AbstractContainerScreen) e.getScreen()).getContainer().inventorySlots) {
                 //Color terminal
                 if (colors(s) && !startsWith) {
                     SolverUtils.drawOnSlot(e.getMatrixStack(), (ContainerScreen<?>) e.getGui(), s.xPos, s.yPos, 0x99000000);
@@ -209,8 +208,7 @@ public class DungeonEvents {
         }
     }
     @SubscribeEvent
-
-    public static void terminalOpen(PlayerContainerEvent.Open e) {
+    public static void terminalOpen(ScreenOpenEvent e) {
 
         itemType = null;
     }

@@ -1,11 +1,11 @@
 package mod.fealtous.minorconvenience.eventhandlers;
 
 import mod.fealtous.minorconvenience.MinorConvenience;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 
@@ -13,10 +13,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Hotkeys {
-    private static final List<Pair<KeyBinding, Runnable>> KEYBINDS = new LinkedList<>();
+    private static final List<Pair<KeyMapping, Runnable>> KEYBINDS = new LinkedList<>();
     //Cadiboo method.
-    private static Pair<KeyBinding, Runnable> makeKeybind(String name, int key, Runnable act) {
-        KeyBinding keyBinding = new KeyBinding(MinorConvenience.modid + ".key." + name, key, MinorConvenience.modid + ".keycategory");
+    private static Pair<KeyMapping, Runnable> makeKeybind(String name, int key, Runnable act) {
+        KeyMapping keyBinding = new KeyMapping(MinorConvenience.modid + ".key." + name, key, MinorConvenience.modid + ".keycategory");
         ClientRegistry.registerKeyBinding(keyBinding);
         return Pair.of(keyBinding, act);
     }
@@ -24,8 +24,8 @@ public class Hotkeys {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
-        for (Pair<KeyBinding, Runnable> kb: KEYBINDS) {
-            if (kb.getKey().isPressed()) {
+        for (Pair<KeyMapping, Runnable> kb: KEYBINDS) {
+            if (kb.getKey().isDown()) {
                 kb.getValue().run();
             }
         }
@@ -36,15 +36,15 @@ public class Hotkeys {
         KEYBINDS.add(makeKeybind("openwd", GLFW.GLFW_KEY_O, Hotkeys::openWD));
     }
     public static void openPets() {
-        if (Minecraft.getInstance().currentScreen != null) return;
-        Minecraft.getInstance().player.sendChatMessage("/pets");
+        if (Minecraft.getInstance().screen != null) return;
+        Minecraft.getInstance().player.chat("/pets");
     }
     public static void openWD() {
-        if (Minecraft.getInstance().currentScreen != null) return;
-        Minecraft.getInstance().player.sendChatMessage("/wd");
+        if (Minecraft.getInstance().screen != null) return;
+        Minecraft.getInstance().player.chat("/wd");
     }
     public static void openEnderChest() {
-        if (Minecraft.getInstance().currentScreen != null) return;
-        Minecraft.getInstance().player.sendChatMessage("/ec");
+        if (Minecraft.getInstance().screen != null) return;
+        Minecraft.getInstance().player.chat("/ec");
     }
 }
