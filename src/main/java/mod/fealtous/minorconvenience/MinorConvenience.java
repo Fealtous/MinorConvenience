@@ -1,6 +1,5 @@
 package mod.fealtous.minorconvenience;
 
-import com.ibm.icu.impl.Pair;
 import mod.fealtous.minorconvenience.eventhandlers.ChatEvents;
 import mod.fealtous.minorconvenience.eventhandlers.DungeonEvents;
 import mod.fealtous.minorconvenience.eventhandlers.Hotkeys;
@@ -15,12 +14,9 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ExtensionPoint;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

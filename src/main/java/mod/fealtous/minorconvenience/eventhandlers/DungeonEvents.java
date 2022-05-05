@@ -1,16 +1,12 @@
 package mod.fealtous.minorconvenience.eventhandlers;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import mod.fealtous.minorconvenience.MinorConvenience;
 import mod.fealtous.minorconvenience.nondungeonsolvers.SolverUtils;
 import mod.fealtous.minorconvenience.utils.ScoreboardUtil;
-import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.MapItemRenderer;
 import net.minecraft.client.gui.screen.inventory.ChestScreen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -22,13 +18,8 @@ import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.StringUtils;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.*;
 import net.minecraft.world.storage.MapData;
-import net.minecraft.world.storage.MapDecoration;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -130,6 +121,7 @@ public class DungeonEvents {
                 iTextComponent.getSiblings().forEach((i) -> {
                     ((IFormattableTextComponent) i).setStyle(e.getMessage().getStyle().setFormatting(TextFormatting.GREEN));
                 });
+
                 e.setMessage(iTextComponent);
                 break;
             }
@@ -150,7 +142,7 @@ public class DungeonEvents {
             if (!tags.contains("baseStatBoostPercentage")) return;
             int statBoost = tags.getInt("baseStatBoostPercentage");
             int floor = tags.getInt("item_tier");
-            tt.add(0,new StringTextComponent("Floor: ").mergeStyle(TextFormatting.GOLD).appendString((floor > 7 ? "M" + (floor - 6) : floor) + " | " + statBoost + "%"));
+            tt.add(new StringTextComponent("Floor: ").mergeStyle(TextFormatting.GOLD).appendString((floor > 7 ? "M" + (floor - 6) : floor) + " | " + statBoost + "%"));
         }
     }
     static String itemType;
@@ -165,11 +157,10 @@ public class DungeonEvents {
         if (mc.currentScreen instanceof ChestScreen) {
             if ( player == null) return;
             String inventoryName = mc.currentScreen.getTitle().getString().trim();
-            if (inventoryName.startsWith("Select all the ")) {
+            if (inventoryName.contains("Select all the ")) {
                 itemType = inventoryName.split(" ")[3];
-
             }
-            if (inventoryName.startsWith("What starts with")) {
+            if (inventoryName.contains("What starts with")) {
                 itemType = inventoryName.split(" ")[3].substring(0,1);
             }
         }
@@ -194,11 +185,10 @@ public class DungeonEvents {
         }
     }
     @SubscribeEvent
-
     public static void terminalOpen(GuiOpenEvent e) {
         itemType = null;
     }
-    private static boolean colors(Slot s) {
+    private static boolean colors(Slot s) { //Does this actually work? Shouldn't it be ORs not ANDs? Maybe there's some other reason
         String sName = StringUtils.stripControlCodes(s.getStack().getDisplayName().getString().toUpperCase());
         //Brute force any oddities
         if (sName.contains(itemType)) return true;
@@ -215,20 +205,15 @@ public class DungeonEvents {
      */
     @SubscribeEvent
     public static void renderMinimap(RenderGameOverlayEvent e) {
-
         Minecraft mc = Minecraft.getInstance();
         if (e.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
         if (mc.player == null || mc.world == null) return;
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         ItemStack i = mc.player.inventory.mainInventory.get(8); //todo
         float mapScale = 2f; //todo add ingame minimap scaling
-
         if (i.getItem() instanceof FilledMapItem) {
-
             MapData data = FilledMapItem.getData(i, mc.world);
-
             if (data != null) {
-
                 MatrixStack ms = e.getMatrixStack();
                 ms.push();
                 ms.translate(mc.gameSettings.guiScale *2,mc.gameSettings.guiScale *2,0);
