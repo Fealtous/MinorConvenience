@@ -10,10 +10,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.ShovelItem;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -37,6 +39,7 @@ public class MinorConvenience
         MinecraftForge.EVENT_BUS.register(ChatEvents.class);
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(ExperimentSolver.class);
+
     }
 
     public void clientSetup (FMLClientSetupEvent e) {
@@ -48,6 +51,7 @@ public class MinorConvenience
     @SubscribeEvent
     public void superGigaStemProtector(InputEvent.ClickInputEvent e) {
         ClientWorld world = Minecraft.getInstance().world;
+
         if (!e.isAttack() || world == null) return;
         Object o = Minecraft.getInstance().objectMouseOver;
         BlockRayTraceResult blockLook = null;

@@ -2,23 +2,28 @@ package mod.fealtous.minorconvenience.utils;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import jdk.jfr.internal.Logger;
+import mod.fealtous.minorconvenience.MinorConvenience;
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.*;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
+import org.apache.logging.log4j.Level;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ScoreboardUtil {
+public class StringUtilManager {
 
     //Had to custom write this, don't know what's wrong
+    //Definitely don't call this very often because it iterates across an entire string
     public static String cleanInput(ITextComponent scoreboard) {
         char[] nvString = scoreboard.getString().toCharArray();
         StringBuilder stringBuilder = new StringBuilder();
@@ -65,8 +70,10 @@ public class ScoreboardUtil {
             bars.add((ITextComponent) ScorePlayerTeam.func_237500_a_(team, pname));
         }
         return bars;
+    }
 
-
-
+    public static void applyCopyText(ITextComponent text) {
+        if (text.getStyle().getClickEvent() != null) return;
+        ((IFormattableTextComponent) text).modifyStyle((msg) -> text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, text.getString())).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("chat.copy.click"))));
     }
 }

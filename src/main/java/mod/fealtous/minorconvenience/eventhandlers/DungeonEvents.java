@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import mod.fealtous.minorconvenience.MinorConvenience;
 import mod.fealtous.minorconvenience.nondungeonsolvers.SolverUtils;
-import mod.fealtous.minorconvenience.utils.ScoreboardUtil;
+import mod.fealtous.minorconvenience.utils.StringUtilManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.inventory.ChestScreen;
@@ -45,9 +45,9 @@ public class DungeonEvents {
         counter++;
         boolean flag = false; //Yes, I know it's ugly...
         if (counter % 200 == 0) {
-            List<ITextComponent> scoreboard = ScoreboardUtil.getSidebars();
+            List<ITextComponent> scoreboard = StringUtilManager.getSidebars();
             for (ITextComponent s : scoreboard) {
-                inDungeons = (ScoreboardUtil.cleanInput(s).contains("Catacombs"));
+                inDungeons = (StringUtilManager.cleanInput(s).contains("Catacombs"));
                 if (inDungeons) break;
             }
         }
@@ -81,11 +81,11 @@ public class DungeonEvents {
         MatrixStack matrixStack = e.getMatrixStack();
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         if (buffer == null) return;
-        IVertexBuilder iVertexBuilder = buffer.getBuffer(RenderType.getLines());
+        IVertexBuilder iVertexBuilder = buffer.getBuffer(RenderType.LINES);
         matrixStack.push();
         ClientPlayerEntity player = Minecraft.getInstance().player;
         if (player == null) return;
-        matrixStack.translate(-player.getPosX(),-player.getPosYEye(),-player.getPosZ());
+        matrixStack.translate(-player.getPosX(),-player.getPosY(),-player.getPosZ());
         if (!bOrdered.isEmpty()) {
             if (bOrdered.size() != 1) {
                 WorldRenderer.drawBoundingBox(matrixStack, iVertexBuilder, bOrdered.getFirst().getBoundingBox(), 1, 0, 0, 1);
@@ -210,9 +210,9 @@ public class DungeonEvents {
         if (mc.player == null || mc.world == null) return;
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         ItemStack i = mc.player.inventory.mainInventory.get(8); //todo
-        float mapScale = 2f; //todo add ingame minimap scaling
+        float mapScale = 1.5f; //todo add ingame minimap scaling
         if (i.getItem() instanceof FilledMapItem) {
-            MapData data = FilledMapItem.getData(i, mc.world);
+            MapData data = FilledMapItem.getMapData(i, mc.world);
             if (data != null) {
                 MatrixStack ms = e.getMatrixStack();
                 ms.push();

@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+
         jcenter()
         mavenCentral()
     }
@@ -9,6 +10,7 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'

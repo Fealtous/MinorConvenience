@@ -17,5 +17,6 @@ public class SolverUtils {
        RenderSystem.disableDepthTest();
        Screen.fill(matrixStack, x, y, x+16, y+16, color);
        matrixStack.pop();
+
     }
 }
